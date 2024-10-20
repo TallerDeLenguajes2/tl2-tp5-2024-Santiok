@@ -6,7 +6,7 @@ public class PresupuestosRepository : IRepository<Presupuestos>
 {
     private readonly string cadenaDeConexion = "Data Source=bd/Tienda.db;Cache=Shared";
 
-    //Insertar presupuesto.
+    //Insertar presupuesto. --
     public void Insertar(Presupuestos pres)
     {
           using(var connection = new SqliteConnection(cadenaDeConexion))
@@ -14,6 +14,7 @@ public class PresupuestosRepository : IRepository<Presupuestos>
             connection.Open();
 
             string query = "INSERT INTO Presupuestos (NombreDestinatario, FechaCreacion) VALUES ($nom, $fec)";
+
             SqliteCommand command = new SqliteCommand(query, connection);
             command.Parameters.AddWithValue("$nom", pres.NombreDestinatario);
             command.Parameters.AddWithValue("$fec", pres.FechaCreacion);
@@ -21,8 +22,8 @@ public class PresupuestosRepository : IRepository<Presupuestos>
             connection.Close();
         }
     }
-/*
-    //Modificar un presupuesto.
+
+    //Modificar un presupuesto. --
     public void Modificar(int id, Presupuestos pres)
     {
         using(var connection = new SqliteConnection(cadenaDeConexion))
@@ -30,7 +31,9 @@ public class PresupuestosRepository : IRepository<Presupuestos>
             connection.Open();
 
             string query = "UPDATE Presupuetos (NombreDestinatario, FechaCreacion) VALUES ($desc, $precio) WHERE idProductos = $id_pasado;";
+
             SqliteCommand command = new SqliteCommand(query, connection);
+
             command.Parameters.AddWithValue("$desc", prod.Descripcion);
             command.Parameters.AddWithValue("$precio", prod.Precio);
             command.Parameters.AddWithValue("$id_pasado", prod.IdProducto);
@@ -38,8 +41,8 @@ public class PresupuestosRepository : IRepository<Presupuestos>
             connection.Close();
         }
     }
-*/
-    //Listar los presupuestos.
+
+    //Listar los presupuestos.--?
     public List<Presupuestos> Listar()
     {
         List<Presupuestos> listaPres = new List<Presupuestos>();
@@ -48,6 +51,7 @@ public class PresupuestosRepository : IRepository<Presupuestos>
             connection.Open();
 
             string query = "SELECT * FROM Productos;";
+
             SqliteCommand command = new SqliteCommand(query, connection);
 
             using (SqliteDataReader reader = command.ExecuteReader())
@@ -66,7 +70,7 @@ public class PresupuestosRepository : IRepository<Presupuestos>
         return listaPres;
     }
 
-    //Obtener presupuestos.
+    //Obtener presupuestos. ----?
     public Presupuestos ObtenerPresupuestos(int id)
     {
        var pres = new Presupuestos();
@@ -75,15 +79,22 @@ public class PresupuestosRepository : IRepository<Presupuestos>
         {
             connection.Open();
 
-            string query = "SELECT * FROM Presupuestos WHERE idProductos = $id_pasado LEFT JOIN PresupuestosDetalles USING(idPresupuesto) LEFT JOIN Presupuestos USING(idPresupuesto);";
+            string query = "SELECT p.idPresupuesto, p.NombreDestinatario, p.FechaCreacion, pr.idProducto, pr.Descripcion, pr.Precio, pd.Cantidad    FROM Presupuestos p         WHERE idProductos = $id_pasado     LEFT JOIN PresupuestosDetalles pd   USING(idPresupuesto)       LEFT JOIN Presupuestos  pr USING(idPresupuesto);";
+
             SqliteCommand command = new SqliteCommand(query, connection);
             command.Parameters.AddWithValue("$id_pasado", pres.IdPresupuesto);
 
             using (SqliteDataReader reader = command.ExecuteReader())
             {
-                pres.IdPresupuesto = Convert.ToInt32(reader["idPresupuesto"]);
-                pres.NombreDestinatario = reader["NombreDestinatario"].ToString();
-                pres.FechaCreacion = reader["FechaCreacion"].ToString();
+                while (reader.Read())
+                {
+                    /*pres.IdPresupuesto = Convert.ToInt32(reader["idPresupuesto"]);
+                    pres.NombreDestinatario = reader["NombreDestinatario"].ToString();
+                    pres.FechaCreacion = reader["FechaCreacion"].ToString();*/
+                    var producto = new Producto(sqlReader.GetInt32(3), sqlReader.GetString(4), sqlReader.GetInt32(5));
+                    var detalle = new PresupuestoDetalle(sqlReader.GetInt32(6), producto);
+                    pres.Detalle.Add(detalle);
+                }
             }
 
             connection.Close();
@@ -91,7 +102,7 @@ public class PresupuestosRepository : IRepository<Presupuestos>
         return pres;
     }
 
-    //Eliminar presupuesto.
+    //Eliminar presupuesto.--
     public void Eliminar(int id)
     {
         using (var connection = new SqliteConnection(cadenaDeConexion))

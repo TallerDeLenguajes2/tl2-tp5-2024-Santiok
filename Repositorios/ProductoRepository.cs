@@ -82,9 +82,12 @@ public class ProductoRepository : IRepository<Productos>
 
             using (SqliteDataReader reader = command.ExecuteReader())
             {
-                prod.IdProducto = Convert.ToInt32(reader["idProducto"]);
-                prod.Descripcion = reader["Descripcion"].ToString();
-                prod.Precio = Convert.ToInt32(reader["Precio"]);
+                while (reader.Read())
+                {
+                    prod.IdProducto = Convert.ToInt32(reader["idProducto"]);
+                    prod.Descripcion = reader["Descripcion"].ToString();
+                    prod.Precio = Convert.ToInt32(reader["Precio"]);
+                }
             }
 
             connection.Close();
