@@ -5,12 +5,19 @@ using Models;
 
 public class ProductoRepository : IRepository<Productos>
 {
-    private readonly string connectionString = "Data Source=Db/Tienda.db;Cache=Shared";
+    private readonly string cadenaDeConexion = "Data Source=bd/Tienda.db;Cache=Shared";
 
     //Inserto un producto.
     public void Insertar(Productos prod)
     {
+        using(var connetion = new SqliteConnection(cadenaDeConexion))
+        {
+            connetion.Open();
 
+            
+
+            connetion.Close();
+        }
     }
 
     //Modifico un producto existente.

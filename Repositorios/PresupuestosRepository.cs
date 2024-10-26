@@ -4,7 +4,7 @@ namespace Repositorios;
 
 public class PresupuestosRepository : IRepository<Presupuestos>
 {
-    private readonly string connectionString = "Data Source=Db/Tienda.db;Cache=Shared";
+    private readonly string cadenaDeConexion = "Data Source=bd/Tienda.db;Cache=Shared";
 
     //Insertar presupuesto.
     public void Insertar(Presupuestos pres)
