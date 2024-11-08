@@ -1,7 +1,7 @@
 namespace Repositorios;
 using Microsoft.Data.Sqlite;
 using Models;
-
+////
 public class PresupuestosRepository : IRepository<Presupuestos>
 {
     private readonly string cadenaDeConexion = "Data Source=bd/Tienda.db;Cache=Shared";
