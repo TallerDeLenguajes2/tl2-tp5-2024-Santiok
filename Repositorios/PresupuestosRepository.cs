@@ -9,7 +9,7 @@ public class PresupuestosRepository : IRepository<Presupuestos>
     //Insertar presupuesto. --
     public void Insertar(Presupuestos pres)
     {
-          using(var connection = new SqliteConnection(cadenaDeConexion))
+        using(var connection = new SqliteConnection(cadenaDeConexion))
         {
             connection.Open();
 
@@ -30,19 +30,19 @@ public class PresupuestosRepository : IRepository<Presupuestos>
         {
             connection.Open();
 
-            string query = "UPDATE Presupuetos (NombreDestinatario, FechaCreacion) VALUES ($desc, $precio) WHERE idProductos = $id_pasado;";
+            string query = "UPDATE Presupuetos (NombreDestinatario, FechaCreacion) VALUES ($nom, $fec) WHERE idProductos = $id_pasado;";
 
             SqliteCommand command = new SqliteCommand(query, connection);
 
-            command.Parameters.AddWithValue("$desc", prod.Descripcion);
-            command.Parameters.AddWithValue("$precio", prod.Precio);
-            command.Parameters.AddWithValue("$id_pasado", prod.IdProducto);
+            command.Parameters.AddWithValue("$nom", pres.NombreDestinatario);
+            command.Parameters.AddWithValue("$fec", pres.FechaCreacion);
+            command.Parameters.AddWithValue("$id_pasado", pres.IdPresupuesto);
 
             connection.Close();
         }
     }
 
-    //Listar los presupuestos.--?
+    //Listar los presupuestos.--
     public List<Presupuestos> Listar()
     {
         List<Presupuestos> listaPres = new List<Presupuestos>();
@@ -91,8 +91,8 @@ public class PresupuestosRepository : IRepository<Presupuestos>
                     /*pres.IdPresupuesto = Convert.ToInt32(reader["idPresupuesto"]);
                     pres.NombreDestinatario = reader["NombreDestinatario"].ToString();
                     pres.FechaCreacion = reader["FechaCreacion"].ToString();*/
-                    var producto = new Producto(sqlReader.GetInt32(3), sqlReader.GetString(4), sqlReader.GetInt32(5));
-                    var detalle = new PresupuestoDetalle(sqlReader.GetInt32(6), producto);
+                    var producto = new Productos(sqlReader.GetInt32(3), sqlReader.GetString(4), sqlReader.GetInt32(5));
+                    var detalle = new PresupuestosDetalles(sqlReader.GetInt32(6), producto);
                     pres.Detalle.Add(detalle);
                 }
             }
