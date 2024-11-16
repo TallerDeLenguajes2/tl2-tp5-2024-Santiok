@@ -1,13 +1,13 @@
 namespace Repositorios;
 using Microsoft.Data.Sqlite;
 using Models;
-////
-public class PresupuestosRepository : IRepository<Presupuestos>
+
+public class PresupuestosRepository : IRepository<Presupuesto>
 {
     private readonly string cadenaDeConexion = "Data Source=bd/Tienda.db;Cache=Shared";
 
-    //Insertar presupuesto. --
-    public void Insertar(Presupuestos pres)
+    //Insertar presupuesto.
+    public void Insertar(Presupuesto pres)
     {
         using(var connection = new SqliteConnection(cadenaDeConexion))
         {
@@ -23,8 +23,51 @@ public class PresupuestosRepository : IRepository<Presupuestos>
         }
     }
 
-    //Modificar un presupuesto. --
-    public void Modificar(int id, Presupuestos pres)
+     //Eliminar presupuesto.
+    public void Eliminar(int id)
+    {
+        using (var connection = new SqliteConnection(cadenaDeConexion))
+        {
+            connection.Open();
+
+            string query = "DELETE FROM Presupuestos WHERE idPresupuestos = $id_pasado;";
+            SqliteCommand command = new SqliteCommand(query, connection);
+            command.Parameters.AddWithValue("$id_pasado", id);
+
+            connection.Close();
+        }
+    }
+
+    //Listar los presupuestos.
+    public List<Presupuesto> Listar()
+    {
+        List<Presupuesto> listaPres = new List<Presupuesto>();
+        using (var connection = new SqliteConnection(cadenaDeConexion))
+        {
+            connection.Open();
+
+            string query = "SELECT * FROM Productos;";
+
+            SqliteCommand command = new SqliteCommand(query, connection);
+
+            using (SqliteDataReader reader = command.ExecuteReader())
+            {
+                while(reader.Read())
+                {
+                    var pres = new Presupuesto();
+                    pres.IdPresupuesto = Convert.ToInt32(reader["idPresupuesto"]);
+                    pres.NombreDestinatario = reader["NombreDestinatario"].ToString();
+                    pres.FechaCreacion = reader["FechaCreacion"].ToString();
+                    listaPres.Add(pres);
+                }
+            }
+            connection.Close();
+        }
+        return listaPres;
+    }
+
+    //Modificar un presupuesto.
+    public void Modificar(int id, Presupuesto pres)
     {
         using(var connection = new SqliteConnection(cadenaDeConexion))
         {
@@ -42,78 +85,76 @@ public class PresupuestosRepository : IRepository<Presupuestos>
         }
     }
 
-    //Listar los presupuestos.--
-    public List<Presupuestos> Listar()
-    {
-        List<Presupuestos> listaPres = new List<Presupuestos>();
-        using (var connection = new SqliteConnection(cadenaDeConexion))
-        {
-            connection.Open();
-
-            string query = "SELECT * FROM Productos;";
-
-            SqliteCommand command = new SqliteCommand(query, connection);
-
-            using (SqliteDataReader reader = command.ExecuteReader())
-            {
-                while(reader.Read())
-                {
-                    var pres = new Presupuestos();
-                    pres.IdPresupuesto = Convert.ToInt32(reader["idPresupuesto"]);
-                    pres.NombreDestinatario = reader["NombreDestinatario"].ToString();
-                    pres.FechaCreacion = reader["FechaCreacion"].ToString();
-                    listaPres.Add(pres);
-                }
-            }
-            connection.Close();
-        }
-        return listaPres;
-    }
-
     //Obtener presupuestos. ----?
-    public Presupuestos ObtenerPresupuestos(int id)
+    public Presupuesto ObtenerPresupuestos(int id)
     {
-       var pres = new Presupuestos();
+       using(var connection = new SqliteConnection(cadenaDeConexion))
+       {
+        connection.Open();
 
-        using (var connection = new SqliteConnection(cadenaDeConexion))
+        string queryPresupuesto = "SELECT idPresupuesto,NombreDestinatario FROM Presupuestos WHERE idPresupuesto = @idPresupuesto";
+
+        SqliteCommand commandPresupuesto = new SqliteCommand(queryPresupuesto, connection);
+
+        commandPresupuesto.Parameters.AddWithValue("@idPresupuesto",id);
+
+        using(SqliteDataReader reader = commandPresupuesto.ExecuteReader())
         {
-            connection.Open();
-
-            string query = "SELECT p.idPresupuesto, p.NombreDestinatario, p.FechaCreacion, pr.idProducto, pr.Descripcion, pr.Precio, pd.Cantidad    FROM Presupuestos p         WHERE idProductos = $id_pasado     LEFT JOIN PresupuestosDetalles pd   USING(idPresupuesto)       LEFT JOIN Presupuestos  pr USING(idPresupuesto);";
-
-            SqliteCommand command = new SqliteCommand(query, connection);
-            command.Parameters.AddWithValue("$id_pasado", pres.IdPresupuesto);
-
-            using (SqliteDataReader reader = command.ExecuteReader())
+            while (reader.Reead())
             {
-                while (reader.Read())
+                int idPresupuesto = reader.GetInt32(0);
+                string nombreDestinatario = reader.GetString(1);
+                List<PresupuestoDetalle> detalles = new List<PresupuestoDetalle>();
+
+                string queryDetalles = @"SELECT idProducto,Descripcion,Precio,Cantidad FROM PresupuestosDetalle
+                        INNER JOIN Productos USING(idProducto)
+                        WHERE idPresupuesto = @idPresupuesto";   
+
+                SqliteCommand commandDetalles = new SqliteCommand(queryDetalles, connection);  
+                commandDetalles.Parameters.AddWithValue("@idPresupuesto",idPresupuesto);
+
+                using (SqliteDataReader reader2 = commandDetalles.ExecuteReader())
                 {
-                    /*pres.IdPresupuesto = Convert.ToInt32(reader["idPresupuesto"]);
-                    pres.NombreDestinatario = reader["NombreDestinatario"].ToString();
-                    pres.FechaCreacion = reader["FechaCreacion"].ToString();*/
-                    var producto = new Productos(sqlReader.GetInt32(3), sqlReader.GetString(4), sqlReader.GetInt32(5));
-                    var detalle = new PresupuestosDetalles(sqlReader.GetInt32(6), producto);
-                    pres.Detalle.Add(detalle);
+                    while (reader2.Read())
+                    {
+                        Productos p = new Productos(reader2.GetInt32(0),reader2.GetString(1),reader2.GetInt32(2));
+                        detalles.Add(new PresupuestoDetalle(p,reader2.GetInt32(3)));
+                    }
                 }
+                presupuesto = new Presupuesto(idPresupuesto,nombreDestinatario, detalles);    
             }
-
-            connection.Close();
         }
-        return pres;
+        connection.Close();
+       }
+        return presupuesto;
     }
 
-    //Eliminar presupuesto.--
-    public void Eliminar(int id)
+    //Agregar producto y una cantidad.
+    public bool AgregarProductoYCantidad(int idPresupuesto,int idProducto,int cantidad)
     {
-        using (var connection = new SqliteConnection(cadenaDeConexion))
+        try
         {
-            connection.Open();
+            using(var connection = new SqliteConnection(connectionString))
+            {
+                connection.Open();
+                string query = "INSERT INTO PresupuestosDetalle (idPresupuesto, idProducto, cantidad) VALUES (@idPresupuesto, @idProducto, @cantidad);";
 
-            string query = "DELETE FROM Presupuestos WHERE idPresupuestos = $id_pasado;";
-            SqliteCommand command = new SqliteCommand(query, connection);
-            command.Parameters.AddWithValue("$id_pasado", id);
+                var command = new SqliteCommand(query, connection);
 
-            connection.Close();
+                command.Parameters.AddWithValue("@idPresupuesto",idPresupuesto);
+                command.Parameters.AddWithValue("@idProducto",idProducto);
+                command.Parameters.AddWithValue("@cantidad",cantidad);
+
+                int filasAfectadas = command.ExecuteNonQuery();
+                connection.Close();
+            }
+            return true;
         }
+        catch (SqliteException e)
+        {
+            Console.WriteLine(e.Message);
+        }
+        return false;
     }
     }
+
