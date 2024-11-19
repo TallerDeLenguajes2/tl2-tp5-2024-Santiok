@@ -85,7 +85,7 @@ public class PresupuestosRepository : IRepository<Presupuesto>
         }
     }
 
-    //Obtener presupuestos. ----?
+    //Obtener presupuestos. 
     public Presupuesto ObtenerPresupuestos(int id)
     {
        using(var connection = new SqliteConnection(cadenaDeConexion))
@@ -100,7 +100,7 @@ public class PresupuestosRepository : IRepository<Presupuesto>
 
         using(SqliteDataReader reader = commandPresupuesto.ExecuteReader())
         {
-            while (reader.Reead())
+            while (reader.Read())
             {
                 int idPresupuesto = reader.GetInt32(0);
                 string nombreDestinatario = reader.GetString(1);
@@ -134,7 +134,7 @@ public class PresupuestosRepository : IRepository<Presupuesto>
     {
         try
         {
-            using(var connection = new SqliteConnection(connectionString))
+            using(var connection = new SqliteConnection(cadenaDeConexion))
             {
                 connection.Open();
                 string query = "INSERT INTO PresupuestosDetalle (idPresupuesto, idProducto, cantidad) VALUES (@idPresupuesto, @idProducto, @cantidad);";

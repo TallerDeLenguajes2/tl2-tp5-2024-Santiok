@@ -1,5 +1,5 @@
 namespace Models;
-public class Presupuestos
+public class Presupuesto
 {
     public static double IVA = 0.21;
     private int idPresupuesto;
@@ -13,14 +13,14 @@ public class Presupuestos
     public string FechaCreacion { get => fechaCreacion; set => fechaCreacion = value; }
 
     //Constructores.
-    public Presupuestos()
+    public Presupuesto()
     {
         idPresupuesto = -1;
         nombreDestinatario = string.Empty;
         detalle = new List<PresupuestosDetalles>();
         fechaCreacion = string.Empty;
     }
-    public Presupuestos(int idPresupuesto, string nombreDestinatario, List<PresupuestosDetalles> detalle)
+    public Presupuesto(int idPresupuesto, string nombreDestinatario, List<PresupuestosDetalles> detalle)
     {
         this.idPresupuesto = idPresupuesto;
         this.nombreDestinatario = nombreDestinatario;

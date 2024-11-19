@@ -78,7 +78,7 @@ public class ProductoRepository : IRepository<Producto>
 
             string query = "SELECT * FROM Productos WHERE idProductos = $id_pasado;";
             SqliteCommand command = new SqliteCommand(query, connection);
-            command.Parameters.AddWithValue("$id_pasado", prod.IdProducto);
+            command.Parameters.AddWithValue("$id_pasado", id);
 
             using (SqliteDataReader reader = command.ExecuteReader())
             {
