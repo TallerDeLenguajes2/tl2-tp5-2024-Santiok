@@ -7,7 +7,7 @@ public class ProductoRepository : IRepository<Producto>
 {
     private readonly string cadenaDeConexion = "Data Source=bd/Tienda.db;Cache=Shared";
 
-    //Inserto un producto.
+    //1)Inserto un producto.
     public void Insertar(Producto prod)
     {
         using(var connection = new SqliteConnection(cadenaDeConexion))
@@ -23,7 +23,7 @@ public class ProductoRepository : IRepository<Producto>
         }
     }
 
-    //Modifico un producto existente.
+    //2)Modifico un producto existente.
     public void Modificar(int id, Producto prod)
     {
         using(var connection = new SqliteConnection(cadenaDeConexion))
@@ -40,7 +40,7 @@ public class ProductoRepository : IRepository<Producto>
         }
     }
 
-    //Listo los productos registrados.
+    //3)Listo los productos registrados.
     public List<Producto> Listar()
     {
         List<Producto> listaProd = new List<Producto>();
@@ -67,7 +67,7 @@ public class ProductoRepository : IRepository<Producto>
         return listaProd;
     }
 
-    //Obtengo detalles del producto.
+    //4)Obtengo detalles del producto.
     public Producto Obtener(int id)
     {
         var prod = new Producto();
@@ -95,10 +95,24 @@ public class ProductoRepository : IRepository<Producto>
         return prod;
     }
 
-//Elimino un producto.
+//5)Elimino un producto.
     void IRepository<Producto>.Eliminar(int id)
     {
         using (var connection = new SqliteConnection(cadenaDeConexion))
+        {
+            connection.Open();
+
+            string query = "DELETE FROM Productos WHERE idProductos = $id_pasado;";
+            SqliteCommand command = new SqliteCommand(query, connection);
+            command.Parameters.AddWithValue("$id_pasado", id);
+
+            connection.Close();
+        }
+    }
+
+    internal void Eliminar(int id)
+    {
+         using (var connection = new SqliteConnection(cadenaDeConexion))
         {
             connection.Open();
 

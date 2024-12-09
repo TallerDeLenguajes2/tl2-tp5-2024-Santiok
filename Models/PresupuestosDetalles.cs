@@ -8,9 +8,18 @@ public class PresupuestosDetalles
     public int Cantidad { get => cantidad; set => cantidad = value; }
 
     //Constructores.
+     public PresupuestosDetalles()
+    {
+
+    }
     public PresupuestosDetalles(Producto produ, int cant)
     {
         this.producto = produ;
         this.Cantidad = cant;
+    }
+
+    public void CargarProducto(Producto nuevoProducto)
+    {
+        producto=nuevoProducto;
     }
 }

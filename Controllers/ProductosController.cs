@@ -4,49 +4,42 @@ using Repositorios;
 using Models;
 
 [ApiController]
-[Route("api/[controller]")]
-public class ProductosController : ControllerBase
+[Route("[controller]")]
+public class ProductoController : ControllerBase
 {
-    private readonly ProductoRepository _productoRepo;
+    private static ProductoRepository repositorioProducto = new ProductoRepository();
+    Producto producto = new Producto();
 
-    public ProductosController()
+    [HttpGet("Listar")]
+    public ActionResult<List<Producto>> listarProducto()
     {
-        _productoRepo = new ProductoRepository();
+        return Ok(repositorioProducto.Listar());
     }
 
-    [HttpGet]
-    public IActionResult GetProductos()
+    [HttpPut("Modificar/{id}")]
+    public ActionResult modificarProducto(int  id, string descripcionProducto, int precio)
     {
-        var productos = _productoRepo.Listar();
-        return Ok(productos);
+        producto.Descripcion = descripcionProducto;
+        producto.Precio = precio;
+        repositorioProducto.Modificar(id, producto);
+        return Ok();
     }
 
-    [HttpGet("{id}")]
-    public IActionResult GetProductoById(int id)
+    [HttpGet("Obtener")]
+    public ActionResult<Producto> ObtenerProductoPorId(int id)
     {
-        var producto = _productoRepo.Obtener(id);
-        if (producto == null) return NotFound("Producto no encontrado.");
+        producto = repositorioProducto.Obtener(id);
+        if (producto.Descripcion == null)
+        {
+            return NotFound();
+        }
         return Ok(producto);
     }
 
-    [HttpPost]
-    public IActionResult CrearProducto([FromBody] Producto producto)
+    [HttpPut("Eliminar")]
+    public ActionResult eliminarProducto(int id)
     {
-        _productoRepo.Insertar(producto);
-        return CreatedAtAction(nameof(GetProductoById), new { id = producto.IdProducto }, producto);
-    }
-
-    [HttpPut("{id}")]
-    public IActionResult ModificarProducto(int id, [FromBody] Producto producto)
-    {
-        _productoRepo.Modificar(id, producto);
-        return NoContent();
-    }
-
-    [HttpDelete("{id}")]
-    public IActionResult EliminarProducto(int id)
-    {
-        _productoRepo.Eliminar(id);
-        return NoContent();
+        repositorioProducto.Eliminar(id);
+        return Ok();
     }
 }

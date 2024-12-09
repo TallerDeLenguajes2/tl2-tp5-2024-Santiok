@@ -4,57 +4,25 @@ using Repositorios;
 using Models;
 
 [ApiController]
-[Route("api/[controller]")]
-public class PresupuestosController : ControllerBase
+[Route("[controller]")]
+public class PresupuestoController : ControllerBase
 {
-    private readonly PresupuestosRepository _presupuestoRepo;
+    private PresupuestosRepository presupuestoRepository = new PresupuestosRepository();
+    private ProductoRepository productoRepository = new ProductoRepository();
+    private Presupuesto presupuesto = new Presupuesto();
 
-    public PresupuestosController()
+    public PresupuestoController()
     {
-        _presupuestoRepo = new PresupuestosRepository();
+
     }
 
-    [HttpGet]
-    public IActionResult GetPresupuestos()
+    [HttpPost("CargarPresupuesto")]
+    public ActionResult cargarPresupuesto(string nombreDestinatario, string fechaCreacion)
     {
-        var presupuestos = _presupuestoRepo.Listar();
-        return Ok(presupuestos);
+        presupuesto.NombreDestinatario = nombreDestinatario;
+        presupuesto.FechaCreacion = fechaCreacion;
+        presupuestoRepository.Insertar(presupuesto);
+        return Created();
     }
 
-    [HttpGet("{id}")]
-    public IActionResult GetPresupuestoById(int id)
-    {
-        var presupuesto = _presupuestoRepo.ObtenerPresupuestos(id);
-        if (presupuesto == null) return NotFound("Presupuesto no encontrado.");
-        return Ok(presupuesto);
-    }
-
-    [HttpPost]
-    public IActionResult CrearPresupuesto([FromBody] Presupuesto presupuesto)
-    {
-        _presupuestoRepo.Insertar(presupuesto);
-        return CreatedAtAction(nameof(GetPresupuestoById), new { id = presupuesto.IdPresupuesto }, presupuesto);
-    }
-
-    [HttpPut("{id}")]
-    public IActionResult ModificarPresupuesto(int id, [FromBody] Presupuesto presupuesto)
-    {
-        _presupuestoRepo.Modificar(id, presupuesto);
-        return NoContent();
-    }
-
-    [HttpPost("{idPresupuesto}/productos/{idProducto}")]
-    public IActionResult AgregarProducto(int idPresupuesto, int idProducto, [FromBody] int cantidad)
-    {
-        var success = _presupuestoRepo.AgregarProductoYCantidad(idPresupuesto, idProducto, cantidad);
-        if (!success) return BadRequest("No se pudo agregar el producto.");
-        return NoContent();
-    }
-
-    [HttpDelete("{id}")]
-    public IActionResult EliminarPresupuesto(int id)
-    {
-        _presupuestoRepo.Eliminar(id);
-        return NoContent();
-    }
 }

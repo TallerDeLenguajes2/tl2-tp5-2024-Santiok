@@ -54,4 +54,17 @@ public class Presupuesto
         }
         return cant;
     }
+
+    public void CargarDetallesPresupuesto(List<PresupuestosDetalles> presupuestoDetalles)
+    {
+        detalle=presupuestoDetalles;
+    }
+
+   public void AgregarProducto(Producto nuevoProducto, int cantidadProducto)
+    {
+        PresupuestosDetalles nuevoPresupuestoDetalle = new PresupuestosDetalles();
+        nuevoPresupuestoDetalle.CargarProducto(nuevoProducto);
+        nuevoPresupuestoDetalle.Cantidad = cantidadProducto;
+
+    }
 }

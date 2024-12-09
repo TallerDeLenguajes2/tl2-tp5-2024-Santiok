@@ -6,7 +6,7 @@ public class PresupuestosRepository : IRepository<Presupuesto>
 {
     private readonly string cadenaDeConexion = "Data Source=bd/Tienda.db;Cache=Shared";
 
-    //Insertar presupuesto.
+    //1)Insertar presupuesto.
     public void Insertar(Presupuesto pres)
     {
         using(var connection = new SqliteConnection(cadenaDeConexion))
@@ -23,7 +23,7 @@ public class PresupuestosRepository : IRepository<Presupuesto>
         }
     }
 
-     //Eliminar presupuesto.
+     //5)Eliminar presupuesto.
     public void Eliminar(int id)
     {
         using (var connection = new SqliteConnection(cadenaDeConexion))
@@ -38,7 +38,7 @@ public class PresupuestosRepository : IRepository<Presupuesto>
         }
     }
 
-    //Listar los presupuestos.
+    //2)Listar los presupuestos.
     public List<Presupuesto> Listar()
     {
         List<Presupuesto> listaPres = new List<Presupuesto>();
@@ -85,9 +85,10 @@ public class PresupuestosRepository : IRepository<Presupuesto>
         }
     }
 
-    //Obtener presupuestos. 
+    //3)Obtener presupuestos. 
     public Presupuesto ObtenerPresupuestos(int id)
     {
+       Presupuesto presupuesto = new Presupuesto();
        using(var connection = new SqliteConnection(cadenaDeConexion))
        {
         connection.Open();
@@ -104,7 +105,8 @@ public class PresupuestosRepository : IRepository<Presupuesto>
             {
                 int idPresupuesto = reader.GetInt32(0);
                 string nombreDestinatario = reader.GetString(1);
-                List<PresupuestoDetalle> detalles = new List<PresupuestoDetalle>();
+                List<PresupuestosDetalles> detalles = new List<PresupuestosDetalles>();
+                
 
                 string queryDetalles = @"SELECT idProducto,Descripcion,Precio,Cantidad FROM PresupuestosDetalle
                         INNER JOIN Productos USING(idProducto)
@@ -117,8 +119,8 @@ public class PresupuestosRepository : IRepository<Presupuesto>
                 {
                     while (reader2.Read())
                     {
-                        Productos p = new Productos(reader2.GetInt32(0),reader2.GetString(1),reader2.GetInt32(2));
-                        detalles.Add(new PresupuestoDetalle(p,reader2.GetInt32(3)));
+                        Producto p = new Producto(reader2.GetInt32(0),reader2.GetString(1),reader2.GetInt32(2));
+                        detalles.Add(new PresupuestosDetalles(p,reader2.GetInt32(3)));
                     }
                 }
                 presupuesto = new Presupuesto(idPresupuesto,nombreDestinatario, detalles);    
@@ -129,7 +131,7 @@ public class PresupuestosRepository : IRepository<Presupuesto>
         return presupuesto;
     }
 
-    //Agregar producto y una cantidad.
+    //4)Agregar producto y una cantidad.
     public bool AgregarProductoYCantidad(int idPresupuesto,int idProducto,int cantidad)
     {
         try
@@ -156,5 +158,10 @@ public class PresupuestosRepository : IRepository<Presupuesto>
         }
         return false;
     }
+
+    public Presupuesto Obtener(int id)
+    {
+        throw new NotImplementedException();
     }
+}
 
