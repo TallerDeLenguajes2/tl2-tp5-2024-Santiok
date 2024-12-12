@@ -14,7 +14,7 @@ public class ProductoRepository : IProductoRepository
 
     public bool CrearProducto(Producto producto)
     {
-        string query = "INSERT INTO Produtos (Descripcion, Precio) VALUES (@descripcion, @precio)";
+        string query = "INSERT INTO Productos (Descripcion, Precio) VALUES (@descripcion, @precio)";
         int cantidadFilas = 0;
 
         using (SqliteConnection conexion = new SqliteConnection(cadenaDeConexion))
@@ -75,7 +75,7 @@ public class ProductoRepository : IProductoRepository
 
     public Producto ObtenerProductoPorId(int id)
     {
-        string query = "SELECT * FROM Producto WHERE id = @id";
+        string query = "SELECT * FROM Productos WHERE id = @id";
         Producto producto = null;
 
         using (SqliteConnection conexion = new SqliteConnection(cadenaDeConexion))
