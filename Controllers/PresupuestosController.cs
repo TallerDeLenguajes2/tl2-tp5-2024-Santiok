@@ -7,22 +7,27 @@ using Models;
 [Route("[controller]")]
 public class PresupuestoController : ControllerBase
 {
-    private PresupuestosRepository presupuestoRepository = new PresupuestosRepository();
-    private ProductoRepository productoRepository = new ProductoRepository();
-    private Presupuesto presupuesto = new Presupuesto();
-
-    public PresupuestoController()
+    private readonly ILogger<PresupuestoController> _logger;
+    private readonly PresupuestosRepository presupuestoRepository;
+    public PresupuestoController(ILogger<PresupuestoController> logger)
     {
-
+        _logger = logger;
+        presupuestoRepository = new PresupuestosRepository("Data Source=bd/Tienda.db;Cache=Shared");
     }
 
-    [HttpPost("CargarPresupuesto")]
-    public ActionResult cargarPresupuesto(string nombreDestinatario, string fechaCreacion)
+    [HttpPost("/api/Presupuesto")]
+     public ActionResult<Presupuesto> CrearPresupuesto([FromBody] Presupuesto presupuesto)
     {
-        presupuesto.NombreDestinatario = nombreDestinatario;
-        presupuesto.FechaCreacion = fechaCreacion;
-        presupuestoRepository.Insertar(presupuesto);
-        return Created();
+        bool presupuestoCreado = presupuestoRepository.CrearPresupuesto(presupuesto);
+        if (!presupuestoCreado) return BadRequest("No se pudo crear el presupuesto.");
+        return Ok("El presupuesto se creo con exito.");
     }
 
+    [HttpGet("/api/presupuesto")]
+     public ActionResult<List<Presupuesto>> ListarPresupuesto()
+    {
+        List<Presupuesto> listaPresupuesto = presupuestoRepository.ListarPresupuestos();
+        if (listaPresupuesto is null) return BadRequest("No se pudo completar la accion.");
+        return Ok(listaPresupuesto);
+    }
 }

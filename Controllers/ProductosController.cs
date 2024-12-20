@@ -7,39 +7,35 @@ using Models;
 [Route("[controller]")]
 public class ProductoController : ControllerBase
 {
-    private static ProductoRepository repositorioProducto = new ProductoRepository();
-    Producto producto = new Producto();
-
-    [HttpGet("Listar")]
-    public ActionResult<List<Producto>> listarProducto()
+    private readonly ILogger<ProductoController> _logger;
+    private readonly ProductoRepository productoRepository;
+    public ProductoController(ILogger<ProductoController> logger)
     {
-        return Ok(repositorioProducto.Listar());
+        _logger = logger;
+        productoRepository = new ProductoRepository("Data Source=bd/Tienda.db;Cache=Shared");
     }
 
-    [HttpPut("Modificar/{id}")]
-    public ActionResult modificarProducto(int  id, string descripcionProducto, int precio)
+    [HttpPost("/api/Producto")]
+    public ActionResult<Producto> CrearProducto([FromBody] Producto producto)
     {
-        producto.Descripcion = descripcionProducto;
-        producto.Precio = precio;
-        repositorioProducto.Modificar(id, producto);
-        return Ok();
+        bool productoCreado = productoRepository.CrearProducto(producto);
+        if (!productoCreado) return BadRequest("No se pudo crear el producto.");
+        return Ok("El producto se creo con exito.");
     }
 
-    [HttpGet("Obtener")]
-    public ActionResult<Producto> ObtenerProductoPorId(int id)
+    [HttpGet("/api/Producto")]
+    public ActionResult<List<Producto>> ListarProductos()
     {
-        producto = repositorioProducto.Obtener(id);
-        if (producto.Descripcion == null)
-        {
-            return NotFound();
-        }
-        return Ok(producto);
+        List<Producto> listaProducto = productoRepository.ListarProductos();
+        if (listaProducto is null) return BadRequest("No se pudo completar la accion.");
+        return Ok(listaProducto);
     }
 
-    [HttpPut("Eliminar")]
-    public ActionResult eliminarProducto(int id)
+    [HttpPut("/api/Producto/{Id}")]
+    public ActionResult ModificarNombreProducto(int Id, string nuevoNom)
     {
-        repositorioProducto.Eliminar(id);
-        return Ok();
+        bool productoModificado = productoRepository.ModificarNombre(Id, nuevoNom);
+        if (!productoModificado) return BadRequest("No se pudo completar la accion.");
+        return Ok("Se modifico con exito la tarea.");
     }
 }

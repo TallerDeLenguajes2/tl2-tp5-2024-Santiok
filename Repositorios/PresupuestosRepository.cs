@@ -30,7 +30,7 @@ public class PresupuestosRepository : IPresupuestoRepository
 
     public List<Presupuesto> ListarPresupuestos()
     {
-        string query = "SELECT * FROM Productos";
+        string query = "SELECT * FROM Presupuestos";
         List<Presupuesto> listaPresupuestos = new List<Presupuesto>();
 
         using (SqliteConnection conexion = new SqliteConnection(cadenaDeConexion))

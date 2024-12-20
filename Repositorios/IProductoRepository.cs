@@ -7,4 +7,5 @@ public interface IProductoRepository
     public List<Producto> ListarProductos();
     public Producto ObtenerProductoPorId(int id);
     public bool EliminarProducto(int id);
+    public bool ModificarNombre(int id, string nuevoNom);
 }

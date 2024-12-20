@@ -31,7 +31,7 @@ public class ProductoRepository : IProductoRepository
 
     public bool ModificarProducto(int id, Producto producto)
     {
-        string query = "UPDATE Producto (Descripcion, Precio) VALUES (@descripcion, @precio) WHERE id = @id";
+        string query = "UPDATE Productos (Descripcion, Precio) VALUES (@descripcion, @precio) WHERE idProducto = @id";
         int cantidadFilas = 0;
 
         using (SqliteConnection conexion = new SqliteConnection(cadenaDeConexion))
@@ -40,6 +40,23 @@ public class ProductoRepository : IProductoRepository
             SqliteCommand command = new SqliteCommand(query, conexion);
             command.Parameters.Add(new SqliteParameter("@descripcion", producto.Descripcion));
             command.Parameters.Add(new SqliteParameter("@precio", producto.Precio));
+            command.Parameters.Add(new SqliteParameter("@id", id));
+            cantidadFilas = command.ExecuteNonQuery();
+            conexion.Close();
+        }
+        return cantidadFilas > 0;
+    }
+
+    public bool ModificarNombre(int id, string nuevoNom)
+    {
+        string query =  "UPDATE Productos SET Descripcion = @descripcion WHERE idProducto = @id";;
+        int cantidadFilas = 0;
+
+        using (SqliteConnection conexion = new SqliteConnection(cadenaDeConexion))
+        {
+            conexion.Open();
+            SqliteCommand command = new SqliteCommand(query, conexion);
+            command.Parameters.Add(new SqliteParameter("@descripcion", nuevoNom));
             command.Parameters.Add(new SqliteParameter("@id", id));
             cantidadFilas = command.ExecuteNonQuery();
             conexion.Close();
